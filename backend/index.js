@@ -4,11 +4,20 @@ const app=express();
 const mongoose=require("mongoose");
 const jwt =require ("jsonwebtoken");
 const multer =require("multer");
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const path =require("path");
 const cors=require("cors");
 const { error, log } = require("console");
 
 app.use(express.json());
+
+cloudinary.config({
+  cloud_name: "gud4ragu",
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 app.use(cors());
 
 //Database connection with MongoDB
@@ -24,24 +33,25 @@ app.get("/",(req,res)=>{
 
 //Image Storage Engine
 
-const storage =multer.diskStorage({
-    destination:'./upload/images',
-    filename:(req,file,cb)=>{
-        return cb(null,`${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
-    }
-})
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "ecommerce-products",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  },
+});
 
-const upload =multer({storage:storage})
+const upload = multer({ storage });
 
 //Creating Uplaod Endpoint for images
 
-app.use('/images',express.static('upload/images'))
-app.post("/upload",upload.single('product'),(req,res)=>{
+
+app.post("/upload", upload.single("product"), (req, res) => {
     res.json({
-        success:1,
-        image_url:`https://e-commerce-backend-c626.onrender.com/images/${req.file.filename}`
-    })
-})
+        success: 1,
+        image_url: req.file.path
+    });
+});
 
 //Schema for Creating products
 
