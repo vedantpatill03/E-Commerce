@@ -48,15 +48,20 @@ const upload = multer({ storage });
 
 app.post("/upload", upload.single("product"), (req, res) => {
     try {
-        console.log(req.file);
+        console.log("Uploaded File:");
+        console.log(JSON.stringify(req.file, null, 2));
 
         res.json({
             success: 1,
             image_url: req.file.path
         });
+
     } catch (err) {
-        console.error("UPLOAD ERROR:", err);
-        console.error(err.stack);
+        console.error("========== UPLOAD ERROR ==========");
+        console.error("Message:", err.message);
+        console.error("Stack:", err.stack);
+        console.error("Full Error:", JSON.stringify(err, null, 2));
+
         res.status(500).json({
             success: 0,
             error: err.message
