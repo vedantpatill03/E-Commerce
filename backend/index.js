@@ -47,10 +47,20 @@ const upload = multer({ storage });
 
 
 app.post("/upload", upload.single("product"), (req, res) => {
-    res.json({
-        success: 1,
-        image_url: req.file.path
-    });
+    try {
+        console.log(req.file);
+
+        res.json({
+            success: 1,
+            image_url: req.file.path
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: 0,
+            error: err.message
+        });
+    }
 });
 
 //Schema for Creating products
