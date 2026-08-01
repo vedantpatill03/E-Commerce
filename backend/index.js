@@ -35,10 +35,10 @@ app.get("/",(req,res)=>{
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => ({
+  params: {
     folder: "ecommerce-products",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
-  }),
+  },
 });
 
 const upload = multer({ storage });
@@ -55,7 +55,8 @@ app.post("/upload", upload.single("product"), (req, res) => {
             image_url: req.file.path
         });
     } catch (err) {
-        console.error(err);
+        console.error("UPLOAD ERROR:", err);
+        console.error(err.stack);
         res.status(500).json({
             success: 0,
             error: err.message
