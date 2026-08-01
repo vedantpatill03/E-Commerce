@@ -35,10 +35,10 @@ app.get("/",(req,res)=>{
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
+  params: async (req, file) => ({
     folder: "ecommerce-products",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
-  },
+  }),
 });
 
 const upload = multer({ storage });
