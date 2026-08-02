@@ -46,27 +46,52 @@ const upload = multer({ storage });
 //Creating Uplaod Endpoint for images
 
 
-app.post("/upload", upload.single("product"), (req, res) => {
-    try {
-        console.log("Uploaded File:");
-        console.log(JSON.stringify(req.file, null, 2));
+// Creating Upload Endpoint for images
 
-        res.json({
-            success: 1,
-            image_url: req.file.path
-        });
+app.post("/upload", (req, res) => {
 
-    } catch (err) {
-        console.error("========== UPLOAD ERROR ==========");
-        console.error("Message:", err.message);
-        console.error("Stack:", err.stack);
-        console.error("Full Error:", JSON.stringify(err, null, 2));
+    upload.single("product")(req, res, function (err) {
 
-        res.status(500).json({
-            success: 0,
-            error: err.message
-        });
-    }
+        if (err) {
+            console.error("========== MULTER/CLOUDINARY ERROR ==========");
+            console.error(err);
+
+            return res.status(500).json({
+                success: 0,
+                error: err.message
+            });
+        }
+
+        try {
+
+            if (!req.file) {
+                return res.status(400).json({
+                    success: 0,
+                    error: "No file uploaded"
+                });
+            }
+
+            console.log("========== FILE UPLOADED ==========");
+            console.log(req.file);
+
+            res.json({
+                success: 1,
+                image_url: req.file.path
+            });
+
+        } catch (err) {
+
+            console.error("========== UPLOAD ERROR ==========");
+            console.error(err);
+
+            res.status(500).json({
+                success: 0,
+                error: err.message
+            });
+        }
+
+    });
+
 });
 
 //Schema for Creating products
